@@ -1,0 +1,2 @@
+- Export sous forme d'image
+- Réduire la largeur des colonnes
