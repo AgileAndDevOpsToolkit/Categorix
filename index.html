@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tri Express — Catégories personnalisées</title>
+<title>Categorix — Catégories personnalisées</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -455,12 +455,12 @@
 
 <!-- UPLOAD SCREEN -->
 <div id="upload-screen">
-  <div class="app-title">Tri Express</div>
+  <div class="app-title">Categorix</div>
   <p class="app-subtitle">
-    Définissez vos catégories, chargez votre liste, et classez les expressions une par une.
+    Définissez vos catégories, chargez votre liste, et classez les items un par un.
   </p>
 
-  <div class="section-label">1 · Vos catégories</div>
+  <div class="section-label">1 · Définissez vos catégories</div>
   <div class="cat-inputs">
     <div class="cat-row" data-idx="0">
       <span class="cat-dot"></span>
@@ -479,18 +479,18 @@
     </div>
   </div>
 
-  <div class="section-label">2 · Vos expressions</div>
+  <div class="section-label">2 · Vos items à classer</div>
   <div class="drop-zone" id="drop-zone">
     <span class="drop-icon">📂</span>
     <div class="drop-text">Glissez un fichier ici</div>
-    <div class="drop-hint">.txt — une expression par ligne</div>
+    <div class="drop-hint">.txt — un item par ligne</div>
   </div>
   <input type="file" id="file-input" accept=".txt,.csv,.text">
 
   <div class="or-divider">— ou saisissez directement —</div>
 
   <div class="manual-area">
-    <textarea id="manual-input" placeholder="Expression 1&#10;Expression 2&#10;Expression 3&#10;..."></textarea>
+    <textarea id="manual-input" placeholder="Item 1&#10;Item 2&#10;Item 3&#10;..."></textarea>
     <button class="btn-start" id="btn-start">Lancer le tri</button>
     <div class="validation-msg" id="validation-msg"></div>
   </div>
@@ -594,15 +594,15 @@
       msg = 'Les catégories doivent avoir des noms différents.';
     } else if (words.length === 0) {
       ok = false;
-      msg = 'Ajoutez au moins une expression.';
+      msg = 'Ajoutez au moins un item.';
     } else {
-      msg = `${cats.length} catégories · ${words.length} expression${words.length > 1 ? 's' : ''}`;
+      msg = `${cats.length} catégories · ${words.length} item${words.length > 1 ? 's' : ''}`;
     }
 
     validationMsg.textContent = msg;
     btnStart.classList.toggle('active', ok);
     btnStart.textContent = ok
-      ? `Lancer le tri (${words.length} expression${words.length > 1 ? 's' : ''})`
+      ? `Lancer le tri (${words.length} item${words.length > 1 ? 's' : ''})`
       : 'Lancer le tri';
   }
 
@@ -715,7 +715,7 @@
 
     const total = allWords.length;
     document.getElementById('done-summary').textContent =
-      `${total} expression${total > 1 ? 's' : ''} classée${total > 1 ? 's' : ''} — ` +
+      `${total} item${total > 1 ? 's' : ''} classée${total > 1 ? 's' : ''} — ` +
       categories.map((c, i) => `${c}: ${sorted[i].length}`).join(' · ');
 
     const doneCols = document.getElementById('done-columns');
@@ -741,7 +741,7 @@
   // ── Export ──
   function exportCSV() {
     const q = s => `"${String(s).replace(/"/g, '""')}"`;
-    let csv = 'Expression,Catégorie\n';
+    let csv = 'Item,Catégorie\n';
     categories.forEach((c, i) => {
       sorted[i].forEach(w => { csv += `${q(w)},${q(c)}\n`; });
     });
@@ -750,7 +750,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'tri-expressions.csv';
+    a.download = 'tri-items.csv';
     a.click();
     URL.revokeObjectURL(url);
   }
