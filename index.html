@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tri Express — Catégories personnalisées</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --c0: #0ea5e9;  --c0-bg: #0c4a6e;  --c0-light: #e0f2fe;
+    --c1: #a855f7;  --c1-bg: #581c87;  --c1-light: #f3e8ff;
+    --c2: #f97316;  --c2-bg: #7c2d12;  --c2-light: #fff7ed;
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #334155;
+    --text: #f1f5f9;
+    --text-dim: #94a3b8;
+    --radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── UPLOAD SCREEN ── */
+  #upload-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem 1rem 3rem;
+    animation: fadeIn 0.6s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .app-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.3em;
+    background: linear-gradient(135deg, var(--c0), var(--c1), var(--c2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .app-subtitle {
+    color: var(--text-dim);
+    font-weight: 300;
+    font-size: 1.05rem;
+    margin-bottom: 2.5rem;
+    text-align: center;
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  .section-label {
+    width: min(90vw, 520px);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.7rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--surface2);
+  }
+
+  /* Category inputs */
+  .cat-inputs {
+    width: min(90vw, 520px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 2rem;
+  }
+
+  .cat-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+
+  .cat-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.3s;
+    opacity: 0.35;
+  }
+
+  .cat-row.filled .cat-dot {
+    opacity: 1;
+    box-shadow: 0 0 12px currentColor;
+  }
+
+  .cat-row[data-idx="0"] .cat-dot { background: var(--c0); color: var(--c0); }
+  .cat-row[data-idx="1"] .cat-dot { background: var(--c1); color: var(--c1); }
+  .cat-row[data-idx="2"] .cat-dot { background: var(--c2); color: var(--c2); }
+
+  .cat-input {
+    flex: 1;
+    background: var(--surface);
+    border: 2px solid var(--surface2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.25s;
+  }
+
+  .cat-input:focus { outline: none; }
+  .cat-row[data-idx="0"] .cat-input:focus { border-color: var(--c0); }
+  .cat-row[data-idx="1"] .cat-input:focus { border-color: var(--c1); }
+  .cat-row[data-idx="2"] .cat-input:focus { border-color: var(--c2); }
+
+  .cat-input::placeholder { color: var(--text-dim); font-weight: 300; font-style: italic; }
+
+  .cat-optional {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+    width: 68px;
+    text-align: right;
+  }
+
+  .drop-zone {
+    width: min(90vw, 520px);
+    border: 2px dashed var(--surface2);
+    border-radius: var(--radius);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .drop-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(14,165,233,0.05), rgba(168,85,247,0.05), rgba(249,115,22,0.05));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--c1);
+    transform: scale(1.02);
+  }
+
+  .drop-zone:hover::before, .drop-zone.dragover::before { opacity: 1; }
+
+  .drop-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
+  .drop-text { font-size: 1.05rem; font-weight: 500; margin-bottom: 0.4rem; }
+  .drop-hint { color: var(--text-dim); font-size: 0.82rem; font-weight: 300; }
+
+  #file-input { display: none; }
+
+  .or-divider {
+    color: var(--text-dim);
+    margin: 1.3rem 0;
+    font-size: 0.85rem;
+    font-weight: 300;
+  }
+
+  .manual-area { width: min(90vw, 520px); }
+
+  .manual-area textarea {
+    width: 100%;
+    height: 140px;
+    background: var(--surface);
+    border: 2px solid var(--surface2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.88rem;
+    padding: 1rem;
+    resize: vertical;
+    transition: border-color 0.3s;
+  }
+
+  .manual-area textarea:focus { outline: none; border-color: var(--c1); }
+  .manual-area textarea::placeholder { color: var(--text-dim); }
+
+  .btn-start {
+    margin-top: 1rem;
+    width: 100%;
+    padding: 0.9rem 2.5rem;
+    border: none;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--c0), var(--c1));
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .btn-start.active { opacity: 1; pointer-events: all; }
+  .btn-start.active:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(168,85,247,0.3); }
+
+  .validation-msg {
+    margin-top: 0.7rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    min-height: 1.2em;
+  }
+
+  /* ── GAME SCREEN ── */
+  #game-screen { display: none; flex-direction: column; min-height: 100vh; animation: fadeIn 0.5s ease; }
+
+  .progress-bar { height: 4px; background: var(--surface); position: sticky; top: 0; z-index: 100; }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--c0), var(--c1), var(--c2));
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 0 2px 2px 0;
+  }
+
+  .progress-text {
+    text-align: center;
+    padding: 0.6rem;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-weight: 500;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .columns-area {
+    display: grid;
+    gap: 1rem;
+    padding: 0 1rem;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .column { display: flex; flex-direction: column; min-height: 0; border-radius: var(--radius); overflow: hidden; }
+
+  .column-header {
+    padding: 0.8rem 1rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-align: center;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .column-header .count {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 400;
+    opacity: 0.75;
+    background: rgba(255,255,255,0.15);
+    padding: 0.15rem 0.5rem;
+    border-radius: 99px;
+  }
+
+  .k0 .column-header { background: var(--c0-bg); color: var(--c0-light); }
+  .k1 .column-header { background: var(--c1-bg); color: var(--c1-light); }
+  .k2 .column-header { background: var(--c2-bg); color: var(--c2-light); }
+
+  .column-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .column-items::-webkit-scrollbar { width: 4px; }
+  .column-items::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+
+  .word-chip {
+    padding: 0.45rem 0.7rem;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    animation: chipIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    word-break: break-word;
+  }
+
+  @keyframes chipIn {
+    from { opacity: 0; transform: translateY(-15px) scale(0.8); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .k0 .word-chip { background: rgba(14,165,233,0.15);  color: var(--c0-light); border-left: 3px solid var(--c0); }
+  .k1 .word-chip { background: rgba(168,85,247,0.15);  color: var(--c1-light); border-left: 3px solid var(--c1); }
+  .k2 .word-chip { background: rgba(249,115,22,0.15);  color: var(--c2-light); border-left: 3px solid var(--c2); }
+
+  .choice-area {
+    padding: 1.5rem 1rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.2rem;
+    background: var(--surface);
+    border-top: 1px solid var(--surface2);
+  }
+
+  .current-word {
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    font-weight: 700;
+    text-align: center;
+    padding: 0.5rem 1.5rem;
+    min-height: 2.8rem;
+    display: flex;
+    align-items: center;
+    animation: wordPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes wordPop {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .buttons-row { display: flex; gap: 0.8rem; flex-wrap: wrap; justify-content: center; }
+
+  .btn-choice {
+    padding: 0.9rem 1.8rem;
+    border: 2px solid;
+    border-radius: var(--radius);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.98rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: transparent;
+    min-width: 130px;
+    max-width: 260px;
+  }
+
+  .btn-choice:active { transform: scale(0.95); }
+
+  .btn-choice.b0 { color: var(--c0); border-color: var(--c0); }
+  .btn-choice.b0:hover { background: var(--c0); color: var(--c0-bg); box-shadow: 0 0 25px rgba(14,165,233,0.3); }
+  .btn-choice.b1 { color: var(--c1); border-color: var(--c1); }
+  .btn-choice.b1:hover { background: var(--c1); color: var(--c1-bg); box-shadow: 0 0 25px rgba(168,85,247,0.3); }
+  .btn-choice.b2 { color: var(--c2); border-color: var(--c2); }
+  .btn-choice.b2:hover { background: var(--c2); color: var(--c2-bg); box-shadow: 0 0 25px rgba(249,115,22,0.3); }
+
+  /* ── DONE SCREEN ── */
+  #done-screen { display: none; flex-direction: column; min-height: 100vh; animation: fadeIn 0.5s ease; }
+
+  .done-header { text-align: center; padding: 2rem 1rem 1rem; }
+
+  .done-header h2 {
+    font-size: 2rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--c0), var(--c1), var(--c2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.3rem;
+  }
+
+  .done-header p { color: var(--text-dim); font-weight: 300; padding: 0 1rem; }
+
+  .done-columns { display: grid; gap: 1rem; padding: 1rem; flex: 1; }
+
+  .done-col { border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+  .done-col .column-header { padding: 1rem; }
+  .done-col .column-items { padding: 0.8rem; gap: 0.4rem; }
+
+  .done-actions { display: flex; gap: 1rem; justify-content: center; padding: 1.5rem; flex-wrap: wrap; }
+
+  .btn-action {
+    padding: 0.8rem 2rem;
+    border: 2px solid var(--surface2);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-action:hover { border-color: var(--c1); background: var(--surface2); transform: translateY(-2px); }
+  .btn-action.primary { background: linear-gradient(135deg, var(--c0), var(--c1)); border-color: transparent; color: white; }
+  .btn-action.primary:hover { box-shadow: 0 8px 25px rgba(168,85,247,0.3); }
+
+  .kbd-hints {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+    flex-wrap: wrap;
+  }
+
+  .kbd-hints kbd {
+    display: inline-block;
+    background: var(--surface2);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    margin-right: 0.3rem;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  @media (max-width: 600px) {
+    .columns-area, .done-columns { gap: 0.5rem; padding: 0 0.5rem; }
+    .column-header { font-size: 0.72rem; padding: 0.6rem 0.35rem; }
+    .word-chip { font-size: 0.7rem; padding: 0.35rem 0.5rem; }
+    .btn-choice { min-width: 85px; padding: 0.7rem 0.9rem; font-size: 0.8rem; }
+    .current-word { font-size: 1.2rem; }
+    .kbd-hints { display: none; }
+    .cat-optional { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- UPLOAD SCREEN -->
+<div id="upload-screen">
+  <div class="app-title">Tri Express</div>
+  <p class="app-subtitle">
+    Définissez vos catégories, chargez votre liste, et classez les expressions une par une.
+  </p>
+
+  <div class="section-label">1 · Vos catégories</div>
+  <div class="cat-inputs">
+    <div class="cat-row" data-idx="0">
+      <span class="cat-dot"></span>
+      <input type="text" class="cat-input" id="cat-0" placeholder="Finger in the nose" maxlength="40">
+      <span class="cat-optional">requis</span>
+    </div>
+    <div class="cat-row" data-idx="1">
+      <span class="cat-dot"></span>
+      <input type="text" class="cat-input" id="cat-1" placeholder="On croise les doigts" maxlength="40">
+      <span class="cat-optional">requis</span>
+    </div>
+    <div class="cat-row" data-idx="2">
+      <span class="cat-dot"></span>
+      <input type="text" class="cat-input" id="cat-2" placeholder="Je parie pas mon argent dessus" maxlength="40">
+      <span class="cat-optional">optionnel</span>
+    </div>
+  </div>
+
+  <div class="section-label">2 · Vos expressions</div>
+  <div class="drop-zone" id="drop-zone">
+    <span class="drop-icon">📂</span>
+    <div class="drop-text">Glissez un fichier ici</div>
+    <div class="drop-hint">.txt — une expression par ligne</div>
+  </div>
+  <input type="file" id="file-input" accept=".txt,.csv,.text">
+
+  <div class="or-divider">— ou saisissez directement —</div>
+
+  <div class="manual-area">
+    <textarea id="manual-input" placeholder="Expression 1&#10;Expression 2&#10;Expression 3&#10;..."></textarea>
+    <button class="btn-start" id="btn-start">Lancer le tri</button>
+    <div class="validation-msg" id="validation-msg"></div>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen">
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="progress-text" id="progress-text">0 / 0</div>
+  <div class="columns-area" id="columns-area"></div>
+  <div class="choice-area">
+    <div class="current-word" id="current-word"></div>
+    <div class="buttons-row" id="buttons-row"></div>
+    <div class="kbd-hints" id="kbd-hints"></div>
+  </div>
+</div>
+
+<!-- DONE SCREEN -->
+<div id="done-screen">
+  <div class="done-header">
+    <h2>Tri terminé !</h2>
+    <p id="done-summary"></p>
+  </div>
+  <div class="done-columns" id="done-columns"></div>
+  <div class="done-actions">
+    <button class="btn-action" onclick="exportCSV()">📥 Exporter CSV</button>
+    <button class="btn-action" onclick="replaySameCats()">↩️ Nouvelle liste</button>
+    <button class="btn-action primary" onclick="restart()">🔄 Tout recommencer</button>
+  </div>
+</div>
+
+<script>
+  // ── State ──
+  let categories = [];          // ["Cat A", "Cat B", ...] (2 or 3 entries)
+  let allWords = [];
+  let remaining = [];
+  let sorted = [];              // array of arrays, parallel to categories
+  let currentWord = null;
+
+  const KEYS_3 = ['ArrowLeft', 'ArrowDown', 'ArrowRight'];
+  const KEYS_3_LABEL = ['←', '↓', '→'];
+  const KEYS_2 = ['ArrowLeft', 'ArrowRight'];
+  const KEYS_2_LABEL = ['←', '→'];
+
+  // ── Upload screen ──
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+  const manualInput = document.getElementById('manual-input');
+  const btnStart = document.getElementById('btn-start');
+  const validationMsg = document.getElementById('validation-msg');
+  const catInputs = [0, 1, 2].map(i => document.getElementById('cat-' + i));
+
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', () => { if (fileInput.files.length) handleFile(fileInput.files[0]); });
+
+  function handleFile(file) {
+    const reader = new FileReader();
+    reader.onload = e => { manualInput.value = e.target.result; checkReady(); };
+    reader.readAsText(file);
+  }
+
+  manualInput.addEventListener('input', checkReady);
+  catInputs.forEach(inp => inp.addEventListener('input', checkReady));
+
+  function getCategories() {
+    return catInputs.map(i => i.value.trim()).filter(v => v.length > 0);
+  }
+
+  function getWords() {
+    return manualInput.value.trim().split('\n').map(l => l.trim()).filter(l => l.length > 0);
+  }
+
+  function checkReady() {
+    // visual feedback on dots
+    catInputs.forEach((inp, i) => {
+      inp.closest('.cat-row').classList.toggle('filled', inp.value.trim().length > 0);
+    });
+
+    const cats = getCategories();
+    const words = getWords();
+
+    // duplicate category names?
+    const lowered = cats.map(c => c.toLowerCase());
+    const hasDupes = new Set(lowered).size !== lowered.length;
+
+    let ok = true;
+    let msg = '';
+
+    if (cats.length < 2) {
+      ok = false;
+      msg = 'Il faut au minimum 2 catégories.';
+    } else if (hasDupes) {
+      ok = false;
+      msg = 'Les catégories doivent avoir des noms différents.';
+    } else if (words.length === 0) {
+      ok = false;
+      msg = 'Ajoutez au moins une expression.';
+    } else {
+      msg = `${cats.length} catégories · ${words.length} expression${words.length > 1 ? 's' : ''}`;
+    }
+
+    validationMsg.textContent = msg;
+    btnStart.classList.toggle('active', ok);
+    btnStart.textContent = ok
+      ? `Lancer le tri (${words.length} expression${words.length > 1 ? 's' : ''})`
+      : 'Lancer le tri';
+  }
+
+  btnStart.addEventListener('click', () => {
+    const cats = getCategories();
+    const words = getWords();
+    if (cats.length < 2 || words.length === 0) return;
+    categories = cats;
+    startGame(words);
+  });
+
+  // ── Game logic ──
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function buildGameUI() {
+    const n = categories.length;
+    const labels = n === 3 ? KEYS_3_LABEL : KEYS_2_LABEL;
+
+    // Columns
+    const area = document.getElementById('columns-area');
+    area.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+    area.innerHTML = categories.map((c, i) => `
+      <div class="column k${i}">
+        <div class="column-header">${escapeHtml(c)} <span class="count" id="count-${i}">0</span></div>
+        <div class="column-items" id="items-${i}"></div>
+      </div>`).join('');
+
+    // Buttons
+    document.getElementById('buttons-row').innerHTML = categories.map((c, i) =>
+      `<button class="btn-choice b${i}" onclick="choose(${i})">${escapeHtml(c)}</button>`).join('');
+
+    // Keyboard hints
+    document.getElementById('kbd-hints').innerHTML = categories.map((c, i) =>
+      `<span><kbd>${labels[i]}</kbd> ${escapeHtml(c)}</span>`).join('');
+  }
+
+  function startGame(words) {
+    allWords = [...words];
+    remaining = shuffle([...words]);
+    sorted = categories.map(() => []);
+    currentWord = null;
+
+    buildGameUI();
+
+    document.getElementById('upload-screen').style.display = 'none';
+    document.getElementById('done-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'flex';
+
+    updateProgress();
+    nextWord();
+  }
+
+  function nextWord() {
+    if (remaining.length === 0) { showDone(); return; }
+    currentWord = remaining.pop();
+    const el = document.getElementById('current-word');
+    el.textContent = currentWord;
+    el.style.animation = 'none';
+    void el.offsetHeight;
+    el.style.animation = 'wordPop 0.35s cubic-bezier(0.34,1.56,0.64,1)';
+  }
+
+  function choose(idx) {
+    if (currentWord === null || idx >= categories.length) return;
+    sorted[idx].push(currentWord);
+
+    const container = document.getElementById('items-' + idx);
+    const chip = document.createElement('div');
+    chip.className = 'word-chip';
+    chip.textContent = currentWord;
+    container.prepend(chip);
+    container.scrollTop = 0;
+
+    document.getElementById('count-' + idx).textContent = sorted[idx].length;
+
+    currentWord = null;
+    updateProgress();
+    nextWord();
+  }
+
+  function updateProgress() {
+    const done = allWords.length - remaining.length - (currentWord ? 1 : 0);
+    const total = allWords.length;
+    document.getElementById('progress-fill').style.width = `${(done / total) * 100}%`;
+    document.getElementById('progress-text').textContent = `${done} / ${total}`;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('game-screen').style.display !== 'flex') return;
+    const keys = categories.length === 3 ? KEYS_3 : KEYS_2;
+    const idx = keys.indexOf(e.key);
+    if (idx !== -1) { e.preventDefault(); choose(idx); }
+  });
+
+  // ── Done screen ──
+  function showDone() {
+    document.getElementById('game-screen').style.display = 'none';
+    const doneScreen = document.getElementById('done-screen');
+    doneScreen.style.display = 'flex';
+
+    const total = allWords.length;
+    document.getElementById('done-summary').textContent =
+      `${total} expression${total > 1 ? 's' : ''} classée${total > 1 ? 's' : ''} — ` +
+      categories.map((c, i) => `${c}: ${sorted[i].length}`).join(' · ');
+
+    const doneCols = document.getElementById('done-columns');
+    doneCols.style.gridTemplateColumns = `repeat(${categories.length}, 1fr)`;
+    doneCols.innerHTML = categories.map((c, i) => `
+      <div class="done-col k${i}">
+        <div class="column-header">${escapeHtml(c)} <span class="count">${sorted[i].length}</span></div>
+        <div class="column-items" id="done-items-${i}"></div>
+      </div>`).join('');
+
+    categories.forEach((c, i) => {
+      const container = document.getElementById('done-items-' + i);
+      sorted[i].forEach((w, j) => {
+        const chip = document.createElement('div');
+        chip.className = 'word-chip';
+        chip.textContent = w;
+        chip.style.animationDelay = `${j * 0.04}s`;
+        container.appendChild(chip);
+      });
+    });
+  }
+
+  // ── Export ──
+  function exportCSV() {
+    const q = s => `"${String(s).replace(/"/g, '""')}"`;
+    let csv = 'Expression,Catégorie\n';
+    categories.forEach((c, i) => {
+      sorted[i].forEach(w => { csv += `${q(w)},${q(c)}\n`; });
+    });
+
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'tri-expressions.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── Restart options ──
+  function replaySameCats() {
+    // keep categories, ask for a new list
+    document.getElementById('done-screen').style.display = 'none';
+    document.getElementById('upload-screen').style.display = 'flex';
+    manualInput.value = '';
+    fileInput.value = '';
+    checkReady();
+    manualInput.focus();
+  }
+
+  function restart() {
+    document.getElementById('done-screen').style.display = 'none';
+    document.getElementById('upload-screen').style.display = 'flex';
+    manualInput.value = '';
+    fileInput.value = '';
+    catInputs.forEach(i => i.value = '');
+    checkReady();
+  }
+
+  checkReady();
+</script>
+</body>
+</html>
