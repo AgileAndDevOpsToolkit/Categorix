@@ -262,6 +262,9 @@
     display: grid;
     gap: 1rem;
     padding: 0 1rem;
+    width: 100%;
+    max-width: 1080px;
+    align-self: center;
     flex: 1;
     min-height: 0;
     overflow: hidden;
@@ -395,7 +398,15 @@
 
   .done-header p { color: var(--text-dim); font-weight: 300; padding: 0 1rem; }
 
-  .done-columns { display: grid; gap: 1rem; padding: 1rem; flex: 1; }
+  .done-columns {
+    display: grid;
+    gap: 1rem;
+    padding: 1rem;
+    width: 100%;
+    max-width: 1080px;
+    align-self: center;
+    flex: 1;
+  }
 
   .done-col { border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
   .done-col .column-header { padding: 1rem; }
