@@ -1,0 +1,1 @@
+- Augmenter la taille des textes dans la zone principale
