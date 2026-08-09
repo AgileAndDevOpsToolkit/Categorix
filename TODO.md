@@ -1,1 +1,2 @@
 - Augmenter la taille des textes dans la zone principale
+- Pouvoir déplacer un item d'une catégorie à une autre après qu'il ait été classé
