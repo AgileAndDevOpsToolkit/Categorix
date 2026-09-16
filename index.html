@@ -45,7 +45,7 @@
   }
 
   .app-title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(2.4rem, 5vw, 4.5rem);
     font-weight: 900;
     letter-spacing: -0.03em;
     margin-bottom: 0.3em;
@@ -58,16 +58,16 @@
   .app-subtitle {
     color: var(--text-dim);
     font-weight: 300;
-    font-size: 1.05rem;
-    margin-bottom: 2.5rem;
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
     text-align: center;
-    max-width: 520px;
+    max-width: 760px;
     line-height: 1.6;
   }
 
   .section-label {
-    width: min(90vw, 520px);
-    font-size: 0.75rem;
+    width: min(92vw, 760px);
+    font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -87,7 +87,7 @@
 
   /* Category inputs */
   .cat-inputs {
-    width: min(90vw, 520px);
+    width: min(92vw, 760px);
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
@@ -125,9 +125,9 @@
     border-radius: var(--radius);
     color: var(--text);
     font-family: 'Outfit', sans-serif;
-    font-size: 0.95rem;
+    font-size: 1.15rem;
     font-weight: 500;
-    padding: 0.75rem 1rem;
+    padding: 0.9rem 1.15rem;
     transition: border-color 0.25s;
   }
 
@@ -139,19 +139,19 @@
   .cat-input::placeholder { color: var(--text-dim); font-weight: 300; font-style: italic; }
 
   .cat-optional {
-    font-size: 0.7rem;
+    font-size: 0.82rem;
     color: var(--text-dim);
     font-family: 'DM Mono', monospace;
     white-space: nowrap;
-    width: 68px;
+    width: 78px;
     text-align: right;
   }
 
   .drop-zone {
-    width: min(90vw, 520px);
+    width: min(92vw, 760px);
     border: 2px dashed var(--surface2);
     border-radius: var(--radius);
-    padding: 2.5rem 2rem;
+    padding: 3.25rem 2rem;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -176,30 +176,30 @@
 
   .drop-zone:hover::before, .drop-zone.dragover::before { opacity: 1; }
 
-  .drop-icon { font-size: 2.5rem; margin-bottom: 0.8rem; display: block; }
-  .drop-text { font-size: 1.05rem; font-weight: 500; margin-bottom: 0.4rem; }
-  .drop-hint { color: var(--text-dim); font-size: 0.82rem; font-weight: 300; }
+  .drop-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+  .drop-text { font-size: 1.25rem; font-weight: 500; margin-bottom: 0.5rem; }
+  .drop-hint { color: var(--text-dim); font-size: 1rem; font-weight: 300; }
 
   #file-input { display: none; }
 
   .or-divider {
     color: var(--text-dim);
     margin: 1.3rem 0;
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: 300;
   }
 
-  .manual-area { width: min(90vw, 520px); }
+  .manual-area { width: min(92vw, 760px); }
 
   .manual-area textarea {
     width: 100%;
-    height: 140px;
+    height: 180px;
     background: var(--surface);
     border: 2px solid var(--surface2);
     border-radius: var(--radius);
     color: var(--text);
     font-family: 'DM Mono', monospace;
-    font-size: 0.88rem;
+    font-size: 1rem;
     padding: 1rem;
     resize: vertical;
     transition: border-color 0.3s;
@@ -211,13 +211,13 @@
   .btn-start {
     margin-top: 1rem;
     width: 100%;
-    padding: 0.9rem 2.5rem;
+    padding: 1.1rem 2.5rem;
     border: none;
     border-radius: var(--radius);
     background: linear-gradient(135deg, var(--c0), var(--c1));
     color: white;
     font-family: 'Outfit', sans-serif;
-    font-size: 1rem;
+    font-size: 1.15rem;
     font-weight: 700;
     cursor: pointer;
     transition: all 0.3s;
@@ -230,7 +230,7 @@
 
   .validation-msg {
     margin-top: 0.7rem;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: var(--text-dim);
     text-align: center;
     font-family: 'DM Mono', monospace;
