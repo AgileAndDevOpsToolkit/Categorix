@@ -319,7 +319,12 @@
     font-weight: 500;
     animation: chipIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     word-break: break-word;
+    cursor: grab;
   }
+
+  .word-chip:active { cursor: grabbing; }
+  .word-chip.dragging { opacity: 0.45; }
+  .column-items.dragover { outline: 2px dashed var(--text-dim); outline-offset: -4px; }
 
   @keyframes chipIn {
     from { opacity: 0; transform: translateY(-15px) scale(0.8); }
@@ -540,6 +545,7 @@
   let remaining = [];
   let sorted = [];              // array of arrays, parallel to categories
   let currentWord = null;
+  let draggedChip = null;
 
   const KEYS_3 = ['ArrowLeft', 'ArrowDown', 'ArrowRight'];
   const KEYS_3_LABEL = ['←', '↓', '→'];
@@ -648,8 +654,21 @@
     area.innerHTML = categories.map((c, i) => `
       <div class="column k${i}">
         <div class="column-header">${escapeHtml(c)} <span class="count" id="count-${i}">0</span></div>
-        <div class="column-items" id="items-${i}"></div>
+        <div class="column-items" id="items-${i}" data-category-index="${i}"></div>
       </div>`).join('');
+
+    area.querySelectorAll('.column-items').forEach(container => {
+      container.addEventListener('dragover', e => {
+        e.preventDefault();
+        container.classList.add('dragover');
+      });
+      container.addEventListener('dragleave', () => container.classList.remove('dragover'));
+      container.addEventListener('drop', e => {
+        e.preventDefault();
+        container.classList.remove('dragover');
+        moveChipToCategory(container, Number(container.dataset.categoryIndex));
+      });
+    });
 
     // Buttons
     document.getElementById('buttons-row').innerHTML = categories.map((c, i) =>
@@ -691,9 +710,7 @@
     sorted[idx].push(currentWord);
 
     const container = document.getElementById('items-' + idx);
-    const chip = document.createElement('div');
-    chip.className = 'word-chip';
-    chip.textContent = currentWord;
+    const chip = createChip(currentWord, idx);
     container.prepend(chip);
     container.scrollTop = 0;
 
@@ -702,6 +719,42 @@
     currentWord = null;
     updateProgress();
     nextWord();
+  }
+
+  function createChip(word, categoryIndex) {
+    const chip = document.createElement('div');
+    chip.className = 'word-chip';
+    chip.textContent = word;
+    chip.draggable = true;
+    chip.dataset.categoryIndex = categoryIndex;
+    chip.addEventListener('dragstart', e => {
+      draggedChip = chip;
+      chip.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    chip.addEventListener('dragend', () => {
+      chip.classList.remove('dragging');
+      document.querySelectorAll('.column-items.dragover').forEach(container => container.classList.remove('dragover'));
+      draggedChip = null;
+    });
+    return chip;
+  }
+
+  function moveChipToCategory(targetContainer, targetIndex) {
+    if (!draggedChip) return;
+
+    const sourceIndex = Number(draggedChip.dataset.categoryIndex);
+    if (sourceIndex === targetIndex) return;
+
+    const wordIndex = sorted[sourceIndex].indexOf(draggedChip.textContent);
+    if (wordIndex === -1) return;
+
+    const [word] = sorted[sourceIndex].splice(wordIndex, 1);
+    sorted[targetIndex].unshift(word);
+    draggedChip.dataset.categoryIndex = targetIndex;
+    targetContainer.prepend(draggedChip);
+    document.getElementById('count-' + sourceIndex).textContent = sorted[sourceIndex].length;
+    document.getElementById('count-' + targetIndex).textContent = sorted[targetIndex].length;
   }
 
   function updateProgress() {
